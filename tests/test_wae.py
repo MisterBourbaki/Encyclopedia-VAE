@@ -5,12 +5,11 @@ from torchsummary import summary
 
 
 class TestWAE(unittest.TestCase):
-
     def setUp(self) -> None:
-        self.model = WAE_MMD(3, 10, reg_weight = 100)
+        self.model = WAE_MMD(3, 10, reg_weight=100)
 
     def test_summary(self):
-        print(summary(self.model, (3, 64, 64), device='cpu'))
+        print(summary(self.model, (3, 64, 64), device="cpu"))
         # print(summary(self.model2, (3, 64, 64), device='cpu'))
 
     def test_forward(self):
@@ -27,5 +26,5 @@ class TestWAE(unittest.TestCase):
         print(loss)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

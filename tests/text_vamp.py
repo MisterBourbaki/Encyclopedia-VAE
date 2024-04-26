@@ -5,13 +5,12 @@ from torchsummary import summary
 
 
 class TestVVAE(unittest.TestCase):
-
     def setUp(self) -> None:
         # self.model2 = VAE(3, 10)
         self.model = VampVAE(3, latent_dim=10).cuda()
 
     def test_summary(self):
-        print(summary(self.model, (3, 64, 64), device='cpu'))
+        print(summary(self.model, (3, 64, 64), device="cpu"))
         # print(summary(self.model2, (3, 64, 64), device='cpu'))
 
     def test_forward(self):
@@ -24,9 +23,9 @@ class TestVVAE(unittest.TestCase):
         x = torch.randn(144, 3, 64, 64).cuda()
 
         result = self.model(x)
-        loss = self.model.loss_function(*result, M_N = 0.005)
+        loss = self.model.loss_function(*result, M_N=0.005)
         print(loss)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
