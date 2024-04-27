@@ -5,7 +5,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from models import BaseVAE
+from encyclopedia_vae.models import BaseVAE
 
 
 class MSSIMVAE(BaseVAE):
@@ -287,7 +287,7 @@ class MSSIM(nn.Module):
         mssim = torch.stack(mssim)
         mcs = torch.stack(mcs)
 
-        # # Normalize (to avoid NaNs during training unstable models, not compliant with original definition)
+        # # Normalize (to avoid NaNs during training unstable encyclopedia_vae.models, not compliant with original definition)
         # if normalize:
         #     mssim = (mssim + 1) / 2
         #     mcs = (mcs + 1) / 2

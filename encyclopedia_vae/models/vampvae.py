@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from models import BaseVAE
+from encyclopedia_vae.models import BaseVAE
 
 
 class VampVAE(BaseVAE):

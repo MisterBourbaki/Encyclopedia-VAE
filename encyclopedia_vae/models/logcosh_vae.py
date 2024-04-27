@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from models import BaseVAE
+from encyclopedia_vae.models import BaseVAE
 
 
 class LogCoshVAE(BaseVAE):

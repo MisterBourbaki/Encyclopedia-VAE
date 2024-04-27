@@ -4,7 +4,8 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from models import BaseVAE
+from encyclopedia_vae.models import BaseVAE
+from encyclopedia_vae.modules import Encoder, create_final_layer
 
 
 class BetaTCVAE(BaseVAE):
@@ -14,7 +15,7 @@ class BetaTCVAE(BaseVAE):
         self,
         in_channels: int,
         latent_dim: int,
-        hidden_dims: list = None,
+        hidden_dims: list = [32, 32, 32, 32],
         anneal_steps: int = 200,
         alpha: float = 1.0,
         beta: float = 6.0,
@@ -30,27 +31,9 @@ class BetaTCVAE(BaseVAE):
         self.beta = beta
         self.gamma = gamma
 
-        modules = []
-        if hidden_dims is None:
-            hidden_dims = [32, 32, 32, 32]
-
-        # Build Encoder
-        for h_dim in hidden_dims:
-            modules.append(
-                nn.Sequential(
-                    nn.Conv2d(
-                        in_channels,
-                        out_channels=h_dim,
-                        kernel_size=4,
-                        stride=2,
-                        padding=1,
-                    ),
-                    nn.LeakyReLU(),
-                )
-            )
-            in_channels = h_dim
-
-        self.encoder = nn.Sequential(*modules)
+        self.encoder = Encoder(
+            in_channels=in_channels, hidden_dims=hidden_dims, kernel_size=4
+        )
 
         self.fc = nn.Linear(hidden_dims[-1] * 16, 256)
         self.fc_mu = nn.Linear(256, latent_dim)
@@ -80,19 +63,7 @@ class BetaTCVAE(BaseVAE):
 
         self.decoder = nn.Sequential(*modules)
 
-        self.final_layer = nn.Sequential(
-            nn.ConvTranspose2d(
-                hidden_dims[-1],
-                hidden_dims[-1],
-                kernel_size=3,
-                stride=2,
-                padding=1,
-                output_padding=1,
-            ),
-            nn.LeakyReLU(),
-            nn.Conv2d(hidden_dims[-1], out_channels=3, kernel_size=3, padding=1),
-            nn.Tanh(),
-        )
+        self.final_layer = create_final_layer(last_dim=hidden_dims[-1])
 
     def encode(self, input: torch.tensor) -> list[torch.tensor]:
         """

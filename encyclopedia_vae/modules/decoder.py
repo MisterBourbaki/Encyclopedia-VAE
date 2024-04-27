@@ -12,14 +12,12 @@ class Decoder(nn.Module):
         stride: int = 2,
         output_padding: int = 1,
     ):
-        modules = []
-
-        self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1] * 4)
-
-        hidden_dims.reverse()
+        super().__init__()
+        layers = []
+        hidden_dims = hidden_dims[::-1]
 
         for i in range(len(hidden_dims) - 1):
-            modules.append(
+            layers.append(
                 nn.Sequential(
                     nn.ConvTranspose2d(
                         hidden_dims[i],
@@ -34,7 +32,7 @@ class Decoder(nn.Module):
                 )
             )
 
-        self.decoder = nn.Sequential(*modules)
+        self.decoder = nn.Sequential(*layers)
 
     def forward(self, input: torch.tensor) -> torch.tensor:
         return self.decoder(input)

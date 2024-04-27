@@ -3,7 +3,7 @@ from torch import nn
 from torch.nn import functional as F
 from torchvision.models import vgg19_bn
 
-from models import BaseVAE
+from encyclopedia_vae.models import BaseVAE
 
 
 class DFCVAE(BaseVAE):
