@@ -6,7 +6,6 @@ class Encoder(nn.Module):
     def __init__(
         self,
         in_channels,
-        h_dim,
         hidden_dims: list[int] = [32, 64, 128, 256, 512],
         kernel_size: int = 3,
         padding: int = 1,
