@@ -1,4 +1,5 @@
 import torch
+from modules import Decoder, Encoder, create_final_layer
 from torch import nn
 from torch.nn import functional as F
 
@@ -7,76 +8,24 @@ from models import BaseVAE
 
 class VanillaVAE(BaseVAE):
     def __init__(
-        self, in_channels: int, latent_dim: int, hidden_dims: list = None, **kwargs
+        self,
+        in_channels: int,
+        latent_dim: int,
+        hidden_dims: list = [32, 64, 128, 256, 512],
+        **kwargs,
     ) -> None:
         super().__init__()
 
         self.latent_dim = latent_dim
 
-        modules = []
-        if hidden_dims is None:
-            hidden_dims = [32, 64, 128, 256, 512]
-
-        # Build Encoder
-        for h_dim in hidden_dims:
-            modules.append(
-                nn.Sequential(
-                    nn.Conv2d(
-                        in_channels,
-                        out_channels=h_dim,
-                        kernel_size=3,
-                        stride=2,
-                        padding=1,
-                    ),
-                    nn.BatchNorm2d(h_dim),
-                    nn.LeakyReLU(),
-                )
-            )
-            in_channels = h_dim
-
-        self.encoder = nn.Sequential(*modules)
+        self.encoder = Encoder(in_channels=in_channels, hidden_dims=hidden_dims)
         self.fc_mu = nn.Linear(hidden_dims[-1] * 4, latent_dim)
         self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
 
-        # Build Decoder
-        modules = []
+        self.decoder = Decoder(latent_dim=latent_dim, hidden_dims=hidden_dims)
 
-        self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1] * 4)
-
-        hidden_dims.reverse()
-
-        for i in range(len(hidden_dims) - 1):
-            modules.append(
-                nn.Sequential(
-                    nn.ConvTranspose2d(
-                        hidden_dims[i],
-                        hidden_dims[i + 1],
-                        kernel_size=3,
-                        stride=2,
-                        padding=1,
-                        output_padding=1,
-                    ),
-                    nn.BatchNorm2d(hidden_dims[i + 1]),
-                    nn.LeakyReLU(),
-                )
-            )
-
-        self.decoder = nn.Sequential(*modules)
-
-        self.final_layer = nn.Sequential(
-            nn.ConvTranspose2d(
-                hidden_dims[-1],
-                hidden_dims[-1],
-                kernel_size=3,
-                stride=2,
-                padding=1,
-                output_padding=1,
-            ),
-            nn.BatchNorm2d(hidden_dims[-1]),
-            nn.LeakyReLU(),
-            nn.Conv2d(hidden_dims[-1], out_channels=3, kernel_size=3, padding=1),
-            nn.Tanh(),
-        )
+        hidden_dims = hidden_dims.reverse()
+        self.final_layer = create_final_layer(last_dim=hidden_dims[-1])
 
     def encode(self, input: torch.tensor) -> list[torch.tensor]:
         """
