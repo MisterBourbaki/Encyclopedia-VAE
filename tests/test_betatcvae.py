@@ -1,5 +1,6 @@
-import torch
 import unittest
+
+import torch
 from models import BetaTCVAE
 from torchsummary import summary
 

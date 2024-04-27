@@ -1,13 +1,15 @@
-import torch
 import unittest
-from models import BetaVAE
+
+import torch
 from torchsummary import summary
+
+from encyclopedia_vae.models import BetaVAE
 
 
 class TestVAE(unittest.TestCase):
     def setUp(self) -> None:
         # self.model2 = VAE(3, 10)
-        self.model = BetaVAE(3, 10, loss_type="H").cuda()
+        self.model = BetaVAE(3, 10, loss_type="H")
 
     def test_summary(self):
         print(summary(self.model, (3, 64, 64), device="cpu"))
@@ -20,7 +22,7 @@ class TestVAE(unittest.TestCase):
         # print("Model2 Output size:", self.model2(x)[0].size())
 
     def test_loss(self):
-        x = torch.randn(16, 3, 64, 64).cuda()
+        x = torch.randn(16, 3, 64, 64)
 
         result = self.model(x)
         loss = self.model.loss_function(*result, M_N=0.005)

@@ -1,5 +1,6 @@
-import torch
 import unittest
+
+import torch
 from models import VQVAE
 from torchsummary import summary
 

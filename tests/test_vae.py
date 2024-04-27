@@ -1,7 +1,9 @@
-import torch
 import unittest
-from models import VanillaVAE
+
+import torch
 from torchsummary import summary
+
+from encyclopedia_vae.models import VanillaVAE
 
 
 class TestVAE(unittest.TestCase):

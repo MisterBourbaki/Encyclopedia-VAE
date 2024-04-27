@@ -1,5 +1,6 @@
-import torch
 import unittest
+
+import torch
 from models import DFCVAE
 from torchsummary import summary
 
@@ -30,7 +31,7 @@ class TestDFCVAE(unittest.TestCase):
 
     def test_sample(self):
         self.model.cuda()
-        y = self.model.sample(144, 0)
+        self.model.sample(144, 0)
 
 
 if __name__ == "__main__":
