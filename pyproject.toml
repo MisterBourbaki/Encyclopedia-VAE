@@ -6,7 +6,7 @@ authors = ["BaptisteMorisse <bmorisse.math@protonmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.9, <3.13"
 lightning = "^2.2.3"
 rich = "^13.7.1"
 tensorboard = "^2.16.2"
@@ -21,7 +21,7 @@ pydantic = "^2.7.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.1"
-ipython = "^8.23.0"
+ipython = "^8.1"
 pre-commit = "^3.7.0"
 pytest = "^8.1.1"
 
