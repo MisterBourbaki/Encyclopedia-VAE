@@ -1,13 +1,21 @@
-import torch
-from torch import nn
-from torch.nn import functional as F
+from typing import TypedDict
 
+import torch
+from einops.layers.torch import Rearrange
+from torch import nn
+
+from encyclopedia_vae.losses import loss_function
 from encyclopedia_vae.models import BaseVAE
 from encyclopedia_vae.modules import (
     Decoder,
     create_encoder,
     create_final_layer,
 )
+
+
+class EncoderReturn(TypedDict):
+    mu: torch.tensor
+    log_var: torch.tensor
 
 
 class VanillaVAE(BaseVAE):
@@ -23,14 +31,14 @@ class VanillaVAE(BaseVAE):
         self.latent_dim = latent_dim
 
         self.encoder = create_encoder(in_channels=in_channels, hidden_dims=hidden_dims)
+
         self.fc_mu = nn.Linear(hidden_dims[-1] * 4, latent_dim)
         self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
 
         self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1] * 4)
+        self.reshape = Rearrange("B (C H W) -> B C H W", C=hidden_dims[-1], H=2, W=2)
         self.decoder = Decoder(latent_dim=latent_dim, hidden_dims=hidden_dims)
-
-        hidden_dims = hidden_dims[::-1]
-        self.final_layer = create_final_layer(last_dim=hidden_dims[-1])
+        self.final_layer = create_final_layer(last_dim=hidden_dims[0])
 
     def encode(self, input: torch.tensor) -> list[torch.tensor]:
         """
@@ -47,7 +55,8 @@ class VanillaVAE(BaseVAE):
         mu = self.fc_mu(result)
         log_var = self.fc_var(result)
 
-        return [mu, log_var]
+        # return [mu, log_var]
+        return EncoderReturn(mu=mu, log_var=log_var)
 
     def decode(self, z: torch.tensor) -> torch.tensor:
         """
@@ -57,12 +66,12 @@ class VanillaVAE(BaseVAE):
         :return: (torch.tensor) [B x C x H x W]
         """
         result = self.decoder_input(z)
-        result = result.view(-1, 512, 2, 2)
+        result = self.reshape(result)
         result = self.decoder(result)
         result = self.final_layer(result)
         return result
 
-    def reparameterize(self, mu: torch.tensor, logvar: torch.tensor) -> torch.tensor:
+    def reparametrize(self, mu: torch.tensor, logvar: torch.tensor) -> torch.tensor:
         """
         Reparameterization trick to sample from N(mu, var) from
         N(0,1).
@@ -75,36 +84,20 @@ class VanillaVAE(BaseVAE):
         return eps * std + mu
 
     def forward(self, input: torch.tensor, **kwargs) -> list[torch.tensor]:
-        mu, log_var = self.encode(input)
-        z = self.reparameterize(mu, log_var)
+        mu, log_var = self.encode(input).values()
+        z = self.reparametrize(mu, log_var)
         return [self.decode(z), input, mu, log_var]
 
-    def loss_function(self, *args, **kwargs) -> dict:
-        """
-        Computes the VAE loss function.
+    def loss_function_(self, input, recons, mu, log_var, kld_weight, **kwargs) -> dict:
+        """Computes the VAE loss function.
+
         KL(N(\mu, \sigma), N(0, 1)) = \log \frac{1}{\sigma} + \frac{\sigma^2 + \mu^2}{2} - \frac{1}{2}
         :param args:
         :param kwargs:
         :return:
         """
-        recons = args[0]
-        input = args[1]
-        mu = args[2]
-        log_var = args[3]
 
-        kld_weight = kwargs["M_N"]  # Account for the minibatch samples from the dataset
-        recons_loss = F.mse_loss(recons, input)
-
-        kld_loss = torch.mean(
-            -0.5 * torch.sum(1 + log_var - mu**2 - log_var.exp(), dim=1), dim=0
-        )
-
-        loss = recons_loss + kld_weight * kld_loss
-        return {
-            "loss": loss,
-            "Reconstruction_Loss": recons_loss.detach(),
-            "KLD": -kld_loss.detach(),
-        }
+        return loss_function(input, recons, mu, log_var, kld_weight)
 
     def sample(self, num_samples: int, current_device: int, **kwargs) -> torch.tensor:
         """
