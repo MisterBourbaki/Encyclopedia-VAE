@@ -12,7 +12,8 @@ class EncoderReturn(TypedDict):
 class ForwardReturn(TypedDict):
     output: torch.tensor
     input: torch.tensor
-    latents: EncoderReturn
+    encoded: EncoderReturn
+    latents: torch.tensor
 
 
 class LossReturn(TypedDict):

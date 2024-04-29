@@ -30,7 +30,7 @@ class VanillaVAE(nn.Module):
             latent_dim=latent_dim, hidden_dims=hidden_dims[::-1]
         )
 
-    def encode(self, input: torch.tensor) -> list[torch.tensor]:
+    def encode(self, input: torch.tensor) -> EncoderReturn:
         """
         Encodes the input by passing through the encoder network
         and returns the latent codes.
@@ -71,7 +71,9 @@ class VanillaVAE(nn.Module):
         latents = self.encode(input)
         mu, log_var, _ = latents.values()
         z = self.reparametrize(mu, log_var)
-        return ForwardReturn(output=self.decode(z), input=input, latents=latents)
+        return ForwardReturn(
+            output=self.decode(z), input=input, encoded=latents, latents=z
+        )
 
     def loss(self, output_model: ForwardReturn, kld_weight: float) -> LossReturn:
         """Computes the VAE loss function.

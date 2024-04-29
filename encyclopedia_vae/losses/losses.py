@@ -16,7 +16,7 @@ def loss_function(output_model: ForwardReturn, kld_weight) -> LossReturn:
     recons_loss = F.mse_loss(output_model["output"], output_model["input"])
 
     kld_loss = compute_kld_loss(
-        output_model["latents"]["mu"], output_model["latents"]["log_var"]
+        output_model["encoded"]["mu"], output_model["encoded"]["log_var"]
     )
     loss = recons_loss + kld_weight * kld_loss
     return LossReturn(loss=loss, reconstruction_loss=recons_loss, kld_loss=-kld_loss)
@@ -43,7 +43,7 @@ def loss_function_beta(
     recons_loss = F.mse_loss(output_model["output"], output_model["input"])
 
     kld_loss = compute_kld_loss(
-        output_model["latents"]["mu"], output_model["latents"]["log_var"]
+        output_model["encoded"]["mu"], output_model["encoded"]["log_var"]
     )
 
     if loss_type == "H":  # https://openreview.net/forum?id=Sy2fzU9gl
