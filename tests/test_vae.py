@@ -1,6 +1,7 @@
 import unittest
 
 import torch
+from rich import print as pprint
 from torchsummary import summary
 
 from encyclopedia_vae.models import VanillaVAE
@@ -12,21 +13,21 @@ class TestVAE(unittest.TestCase):
         self.model = VanillaVAE(3, 10)
 
     def test_summary(self):
-        print(summary(self.model, (3, 64, 64), device="cpu"))
+        pprint(summary(self.model, (3, 64, 64), device="cpu"))
         # print(summary(self.model2, (3, 64, 64), device='cpu'))
 
     def test_forward(self):
         x = torch.randn(16, 3, 64, 64)
         y = self.model(x)
-        print("Model Output size:", y["output"].size())
+        pprint("Model Output size:", y["output"].size())
         # print("Model2 Output size:", self.model2(x)[0].size())
 
     def test_loss(self):
         x = torch.randn(16, 3, 64, 64)
 
         result = self.model(x)
-        loss = self.model.loss_function(*result, M_N=0.005)
-        print(loss)
+        loss = self.model.loss(result, kld_weight=0.005)
+        pprint(f"Loss is {loss}")
 
 
 if __name__ == "__main__":

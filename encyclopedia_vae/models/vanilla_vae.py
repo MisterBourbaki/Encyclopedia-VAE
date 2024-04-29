@@ -1,30 +1,16 @@
-from typing import TypedDict
-
 import torch
 from einops.layers.torch import Rearrange
 from torch import nn
 
 from encyclopedia_vae.losses import loss_function
-from encyclopedia_vae.models import BaseVAE
 from encyclopedia_vae.modules import (
     build_encoder,
     build_full_decoder,
 )
+from encyclopedia_vae.types import EncoderReturn, ForwardReturn
 
 
-class EncoderReturn(TypedDict):
-    mu: torch.tensor
-    log_var: torch.tensor
-    pre_latents: torch.tensor
-
-
-class ForwardReturn(TypedDict):
-    output: torch.tensor
-    input: torch.tensor
-    latents: EncoderReturn
-
-
-class VanillaVAE(BaseVAE):
+class VanillaVAE(nn.Module):
     def __init__(
         self,
         in_channels: int,
@@ -100,7 +86,7 @@ class VanillaVAE(BaseVAE):
         # return [self.decode(z), input, mu, log_var]
         return ForwardReturn(output=self.decode(z), input=input, latents=latents)
 
-    def loss_function_(self, input, recons, mu, log_var, kld_weight, **kwargs) -> dict:
+    def loss(self, output_model: ForwardReturn, kld_weight, **kwargs) -> dict:
         """Computes the VAE loss function.
 
         KL(N(\mu, \sigma), N(0, 1)) = \log \frac{1}{\sigma} + \frac{\sigma^2 + \mu^2}{2} - \frac{1}{2}
@@ -109,7 +95,7 @@ class VanillaVAE(BaseVAE):
         :return:
         """
 
-        return loss_function(input, recons, mu, log_var, kld_weight)
+        return loss_function(output_model, kld_weight)
 
     def sample(self, num_samples: int, current_device: int, **kwargs) -> torch.tensor:
         """
