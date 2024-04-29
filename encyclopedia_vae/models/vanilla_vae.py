@@ -16,18 +16,23 @@ class VanillaVAE(nn.Module):
         in_channels: int,
         latent_dim: int,
         hidden_dims: list = [32, 64, 128, 256, 512],
+        mid_inflate: int = 2,
+        mid_dim: int = 512 * 4,
     ) -> None:
         super().__init__()
 
         self.latent_dim = latent_dim
 
         self.encoder = build_encoder(in_channels=in_channels, hidden_dims=hidden_dims)
-        self.flatten = Rearrange("B C H W -> B (C H W)", H=2, W=2)
-        self.fc_mu = nn.Linear(hidden_dims[-1] * 4, latent_dim)
-        self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
+        self.flatten = Rearrange("B C H W -> B (C H W)")
+        self.fc_mu = nn.Linear(mid_dim, latent_dim)
+        self.fc_var = nn.Linear(mid_dim, latent_dim)
 
         self.full_decoder = build_full_decoder(
-            latent_dim=latent_dim, hidden_dims=hidden_dims[::-1]
+            latent_dim=latent_dim,
+            hidden_dims=hidden_dims[::-1],
+            mid_inflate=mid_inflate,
+            mid_dim=mid_dim,
         )
 
     def encode(self, input: torch.tensor) -> EncoderReturn:
@@ -105,4 +110,4 @@ class VanillaVAE(nn.Module):
         :return: (torch.tensor) [B x C x H x W]
         """
 
-        return self.forward(x)[0]
+        return self.forward(x)["output"]

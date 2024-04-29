@@ -36,10 +36,14 @@ def build_full_decoder(
     padding: int = 1,
     stride: int = 2,
     output_padding: int = 1,
+    mid_dim: int = 512 * 4,
+    mid_inflate: int = 2,
 ):
     module = nn.Sequential(
-        nn.Linear(latent_dim, hidden_dims[0] * 4),
-        Rearrange("B (C H W) -> B C H W", C=hidden_dims[0], H=2, W=2),
+        nn.Linear(latent_dim, mid_dim),
+        Rearrange(
+            "B (C H W) -> B C H W", C=hidden_dims[0], H=mid_inflate, W=mid_inflate
+        ),
         build_core_decoder(
             hidden_dims=hidden_dims,
             kernel_size=kernel_size,
