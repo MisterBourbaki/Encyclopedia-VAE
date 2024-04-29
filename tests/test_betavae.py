@@ -18,14 +18,14 @@ class TestVAE(unittest.TestCase):
     def test_forward(self):
         x = torch.randn(16, 3, 64, 64)
         y = self.model(x)
-        print("Model Output size:", y[0].size())
+        print("Model Output size:", y["output"].size())
         # print("Model2 Output size:", self.model2(x)[0].size())
 
     def test_loss(self):
         x = torch.randn(16, 3, 64, 64)
 
         result = self.model(x)
-        loss = self.model.loss_function(*result, M_N=0.005)
+        loss = self.model.loss(result, kld_weight=0.005)
         print(loss)
 
 
