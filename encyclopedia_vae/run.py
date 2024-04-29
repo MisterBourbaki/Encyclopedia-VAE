@@ -3,14 +3,15 @@ import os
 from pathlib import Path
 
 import yaml
-from dataset import VAEDataset
 from experiment import VAEXperiment
-from models import *
+from models import vae_models
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.plugins import DDPPlugin
 from pytorch_lightning.utilities.seed import seed_everything
+
+from encyclopedia_vae.dataset import VAEDataset
 
 parser = argparse.ArgumentParser(description="Generic runner for VAE models")
 parser.add_argument(
