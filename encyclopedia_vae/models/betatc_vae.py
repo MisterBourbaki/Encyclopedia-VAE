@@ -2,11 +2,11 @@ import torch
 from torch import nn
 
 from encyclopedia_vae.losses import loss_function_betatc
-from encyclopedia_vae.models import VanillaVAE
+from encyclopedia_vae.models.vanilla_vae import VanillaVAE
 from encyclopedia_vae.modules import (
     build_encoder,
 )
-from encyclopedia_vae.types import EncoderReturn, ForwardReturn
+from encyclopedia_vae.types_helpers import EncoderReturn, ForwardReturn
 
 
 class BetaTCVAE(VanillaVAE):

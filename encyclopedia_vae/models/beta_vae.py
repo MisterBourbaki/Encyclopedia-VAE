@@ -1,6 +1,6 @@
 from encyclopedia_vae.losses import loss_function_beta
 from encyclopedia_vae.models.vanilla_vae import VanillaVAE
-from encyclopedia_vae.types import ForwardReturn, LossReturn
+from encyclopedia_vae.types_helpers import ForwardReturn, LossReturn
 
 
 class BetaVAE(VanillaVAE):

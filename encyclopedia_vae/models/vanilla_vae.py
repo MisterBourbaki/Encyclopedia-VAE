@@ -7,7 +7,7 @@ from encyclopedia_vae.modules import (
     build_encoder,
     build_full_decoder,
 )
-from encyclopedia_vae.types import EncoderReturn, ForwardReturn, LossReturn
+from encyclopedia_vae.types_helpers import EncoderReturn, ForwardReturn, LossReturn
 
 
 class VanillaVAE(nn.Module):

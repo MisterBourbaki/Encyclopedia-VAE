@@ -4,7 +4,7 @@ import torch
 from einops import rearrange
 from torch.nn import functional as F
 
-from encyclopedia_vae.types import ForwardReturn, LossBetaTCReturn, LossReturn
+from encyclopedia_vae.types_helpers import ForwardReturn, LossBetaTCReturn, LossReturn
 
 
 def loss_function(output_model: ForwardReturn, kld_weight) -> LossReturn:
