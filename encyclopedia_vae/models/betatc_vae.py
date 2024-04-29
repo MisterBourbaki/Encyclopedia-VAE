@@ -5,7 +5,11 @@ from torch import nn
 from torch.nn import functional as F
 
 from encyclopedia_vae.models import BaseVAE
-from encyclopedia_vae.modules import Encoder, create_final_layer
+from encyclopedia_vae.modules import (
+    build_core_decoder,
+    build_encoder,
+    create_final_layer,
+)
 
 
 class BetaTCVAE(BaseVAE):
@@ -31,7 +35,7 @@ class BetaTCVAE(BaseVAE):
         self.beta = beta
         self.gamma = gamma
 
-        self.encoder = Encoder(
+        self.encoder = build_encoder(
             in_channels=in_channels, hidden_dims=hidden_dims, kernel_size=4
         )
 
@@ -39,30 +43,10 @@ class BetaTCVAE(BaseVAE):
         self.fc_mu = nn.Linear(256, latent_dim)
         self.fc_var = nn.Linear(256, latent_dim)
 
-        # Build Decoder
-        modules = []
-
         self.decoder_input = nn.Linear(latent_dim, 256 * 2)
+        self.decoder = build_core_decoder(hidden_dims=hidden_dims)
 
-        hidden_dims.reverse()
-
-        for i in range(len(hidden_dims) - 1):
-            modules.append(
-                nn.Sequential(
-                    nn.ConvTranspose2d(
-                        hidden_dims[i],
-                        hidden_dims[i + 1],
-                        kernel_size=3,
-                        stride=2,
-                        padding=1,
-                        output_padding=1,
-                    ),
-                    nn.LeakyReLU(),
-                )
-            )
-
-        self.decoder = nn.Sequential(*modules)
-
+        hidden_dims = hidden_dims[::-1]
         self.final_layer = create_final_layer(last_dim=hidden_dims[-1])
 
     def encode(self, input: torch.tensor) -> list[torch.tensor]:
@@ -166,11 +150,9 @@ class BetaTCVAE(BaseVAE):
         strat_weight = (dataset_size - batch_size + 1) / (
             dataset_size * (batch_size - 1)
         )
-        importance_weights = (
-            torch.torch.tensor(batch_size, batch_size)
-            .fill_(1 / (batch_size - 1))
-            .to(input.device)
-        )
+        importance_weights = torch.full(
+            (batch_size, batch_size), 1 / (batch_size - 1)
+        ).to(input.device)
         importance_weights.view(-1)[::batch_size] = 1 / dataset_size
         importance_weights.view(-1)[1::batch_size] = strat_weight
         importance_weights[batch_size - 2, 0] = strat_weight
@@ -217,7 +199,7 @@ class BetaTCVAE(BaseVAE):
         """
         z = torch.randn(num_samples, self.latent_dim)
 
-        z = z.to(current_device)
+        # z = z.to(current_device)
 
         samples = self.decode(z)
         return samples

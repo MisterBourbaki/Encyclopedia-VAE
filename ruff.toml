@@ -10,7 +10,9 @@ extend-select = [
   "E9",
   "F",
   "I",
+  "PL",
 ]
+ignore = ["PLR0913"]
 
 [lint.pydocstyle]
 convention = "numpy"

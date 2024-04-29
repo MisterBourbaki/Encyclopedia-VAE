@@ -3,7 +3,11 @@ from torch import nn
 from torch.nn import functional as F
 
 from encyclopedia_vae.models import BaseVAE
-from encyclopedia_vae.modules import Decoder, Encoder, create_final_layer
+from encyclopedia_vae.modules import (
+    build_core_decoder,
+    build_encoder,
+    create_final_layer,
+)
 
 
 class BetaVAE(BaseVAE):
@@ -30,15 +34,15 @@ class BetaVAE(BaseVAE):
         self.C_max = torch.torch.tensor([max_capacity])
         self.C_stop_iter = Capacity_max_iter
 
-        self.encoder = Encoder(in_channels=in_channels, hidden_dims=hidden_dims)
+        self.encoder = build_encoder(in_channels=in_channels, hidden_dims=hidden_dims)
         self.fc_mu = nn.Linear(hidden_dims[-1] * 4, latent_dim)
         self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
 
         self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1] * 4)
-        self.decoder = Decoder(latent_dim=latent_dim, hidden_dims=hidden_dims)
+        self.decoder = build_core_decoder(hidden_dims=hidden_dims[::-1])
 
-        hidden_dims = hidden_dims[::-1]
-        self.final_layer = create_final_layer(last_dim=hidden_dims[-1])
+        # hidden_dims = hidden_dims[::-1]
+        self.final_layer = create_final_layer(last_dim=hidden_dims[0])
 
     def encode(self, input: torch.tensor) -> list[torch.tensor]:
         """

@@ -1,8 +1,9 @@
 import unittest
 
 import torch
-from models import BetaTCVAE
 from torchsummary import summary
+
+from encyclopedia_vae.models import BetaTCVAE
 
 
 class TestBetaTCVAE(unittest.TestCase):
@@ -29,7 +30,7 @@ class TestBetaTCVAE(unittest.TestCase):
         print(loss)
 
     def test_sample(self):
-        self.model.cuda()
+        self.model
         y = self.model.sample(8, "cuda")
         print(y.shape)
 
