@@ -1,11 +1,10 @@
 import torch
-from rich import print as pprint
 from torch.nn import functional as F
 
 from encyclopedia_vae.types import ForwardReturn, LossReturn
 
 
-def loss_function(output_model: ForwardReturn, kld_weight, **kwargs) -> LossReturn:
+def loss_function(output_model: ForwardReturn, kld_weight) -> LossReturn:
     """
     Computes the VAE loss function.
     KL(N(\mu, \sigma), N(0, 1)) = \log \frac{1}{\sigma} + \frac{\sigma^2 + \mu^2}{2} - \frac{1}{2}
@@ -14,14 +13,11 @@ def loss_function(output_model: ForwardReturn, kld_weight, **kwargs) -> LossRetu
     :return:
     """
 
-    # kld_weight = kwargs["M_N"]  # Account for the minibatch samples from the dataset
     recons_loss = F.mse_loss(output_model["output"], output_model["input"])
-    pprint(f"In loss function, MSE is {recons_loss}")
 
     kld_loss = compute_kld_loss(
         output_model["latents"]["mu"], output_model["latents"]["log_var"]
     )
-    pprint(f"In loss function, KLD is {kld_loss}")
     loss = recons_loss + kld_weight * kld_loss
     return LossReturn(loss=loss, reconstruction_loss=recons_loss, kld_loss=-kld_loss)
 
@@ -32,3 +28,30 @@ def compute_kld_loss(mu: torch.tensor, log_var: torch.tensor) -> torch.tensor:
     )
 
     return kld_loss
+
+
+def loss_function_beta(
+    output_model: ForwardReturn,
+    kld_weight,
+    num_iter,
+    C_max,
+    C_stop_iter,
+    loss_type,
+    beta,
+    gamma,
+) -> dict:
+    recons_loss = F.mse_loss(output_model["output"], output_model["input"])
+
+    kld_loss = compute_kld_loss(
+        output_model["latents"]["mu"], output_model["latents"]["log_var"]
+    )
+
+    if loss_type == "H":  # https://openreview.net/forum?id=Sy2fzU9gl
+        loss = recons_loss + beta * kld_weight * kld_loss
+    elif loss_type == "B":  # https://arxiv.org/pdf/1804.03599.pdf
+        C = torch.clamp(C_max / C_stop_iter * num_iter, 0, C_max)
+        loss = recons_loss + gamma * kld_weight * (kld_loss - C).abs()
+    else:
+        raise ValueError("Undefined loss type.")
+
+    return LossReturn(loss=loss, reconstruction_loss=recons_loss, kld_loss=-kld_loss)

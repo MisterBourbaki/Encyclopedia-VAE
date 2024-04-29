@@ -7,7 +7,7 @@ from encyclopedia_vae.modules import (
     build_encoder,
     build_full_decoder,
 )
-from encyclopedia_vae.types import EncoderReturn, ForwardReturn
+from encyclopedia_vae.types import EncoderReturn, ForwardReturn, LossReturn
 
 
 class VanillaVAE(nn.Module):
@@ -73,7 +73,7 @@ class VanillaVAE(nn.Module):
         z = self.reparametrize(mu, log_var)
         return ForwardReturn(output=self.decode(z), input=input, latents=latents)
 
-    def loss(self, output_model: ForwardReturn, kld_weight: float) -> dict:
+    def loss(self, output_model: ForwardReturn, kld_weight: float) -> LossReturn:
         """Computes the VAE loss function.
 
         KL(N(\mu, \sigma), N(0, 1)) = \log \frac{1}{\sigma} + \frac{\sigma^2 + \mu^2}{2} - \frac{1}{2}
