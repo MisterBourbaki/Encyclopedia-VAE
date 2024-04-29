@@ -1,29 +1,24 @@
-from typing import Any, Callable, List, Tuple, TypeVar, Union
-
-from .base import *
-from .beta_vae import *
-from .betatc_vae import *
-from .cat_vae import *
-from .cvae import *
-from .dfcvae import *
-from .dip_vae import *
-from .fvae import *
-from .gamma_vae import *
-from .hvae import *
-from .info_vae import *
-from .iwae import *
-from .joint_vae import *
-from .logcosh_vae import *
-
-# from .twostage_vae import *
+from .beta_vae import BetaVAE
+from .betatc_vae import BetaTCVAE
+from .cat_vae import CategoricalVAE
+from .cvae import ConditionalVAE
+from .dfcvae import DFCVAE
+from .dip_vae import DIPVAE
+from .fvae import FactorVAE
+from .gamma_vae import GammaVAE
+from .hvae import HVAE
+from .info_vae import InfoVAE
+from .iwae import IWAE
+from .joint_vae import JointVAE
+from .logcosh_vae import LogCoshVAE
 from .lvae import LVAE
-from .miwae import *
+from .miwae import MIWAE
 from .mssim_vae import MSSIMVAE
-from .swae import *
-from .vampvae import *
-from .vanilla_vae import *
-from .vq_vae import *
-from .wae_mmd import *
+from .swae import SWAE
+from .vampvae import VampVAE
+from .vanilla_vae import VanillaVAE
+from .vq_vae import VQVAE
+from .wae_mmd import WAE_MMD
 
 # Aliases
 VAE = VanillaVAE
@@ -54,3 +49,27 @@ vae_models = {
     "ConditionalVAE": ConditionalVAE,
     "CategoricalVAE": CategoricalVAE,
 }
+
+__all__ = [
+    "HVAE",
+    "LVAE",
+    "IWAE",
+    "SWAE",
+    "MIWAE",
+    "VQVAE",
+    "DFCVAE",
+    "DIPVAE",
+    "BetaVAE",
+    "InfoVAE",
+    "WAE_MMD",
+    "VampVAE",
+    "GammaVAE",
+    "MSSIMVAE",
+    "JointVAE",
+    "BetaTCVAE",
+    "FactorVAE",
+    "LogCoshVAE",
+    "VanillaVAE",
+    "ConditionalVAE",
+    "CategoricalVAE",
+]

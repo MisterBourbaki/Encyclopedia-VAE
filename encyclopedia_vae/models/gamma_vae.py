@@ -1,8 +1,8 @@
 import torch
-import torch.nn.init as init
 from torch import nn
 from torch.distributions import Gamma
 from torch.nn import functional as F
+from torch.nn import init
 
 from encyclopedia_vae.models import BaseVAE
 
