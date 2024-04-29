@@ -1,14 +1,13 @@
-from .decoder import Decoder
-from .encoder import Encoder, create_encoder
-from .final_layer import create_final_layer
+from .decoder import build_core_decoder, build_full_decoder, create_final_layer
+from .encoder import build_encoder
 from .residual import ResidualLayer
 from .vectorquantizer import VectorQuantizer
 
 __all__ = [
     "ResidualLayer",
     "VectorQuantizer",
-    "Encoder",
-    "Decoder",
     "create_final_layer",
-    "create_encoder",
+    "build_encoder",
+    "build_core_decoder",
+    "build_full_decoder",
 ]
