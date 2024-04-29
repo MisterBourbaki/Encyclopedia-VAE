@@ -16,7 +16,6 @@ class VanillaVAE(nn.Module):
         in_channels: int,
         latent_dim: int,
         hidden_dims: list = [32, 64, 128, 256, 512],
-        **kwargs,
     ) -> None:
         super().__init__()
 
@@ -27,10 +26,6 @@ class VanillaVAE(nn.Module):
         self.fc_mu = nn.Linear(hidden_dims[-1] * 4, latent_dim)
         self.fc_var = nn.Linear(hidden_dims[-1] * 4, latent_dim)
 
-        # self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1] * 4)
-        # self.reshape = Rearrange("B (C H W) -> B C H W", C=hidden_dims[-1], H=2, W=2)
-        # self.decoder = build_core_decoder(hidden_dims=hidden_dims)
-        # self.final_layer = create_final_layer(last_dim=hidden_dims[0])
         self.full_decoder = build_full_decoder(
             latent_dim=latent_dim, hidden_dims=hidden_dims[::-1]
         )
@@ -45,12 +40,9 @@ class VanillaVAE(nn.Module):
         result = self.encoder(input)
         result = self.flatten(result)
 
-        # Split the result into mu and var components
-        # of the latent Gaussian distribution
         mu = self.fc_mu(result)
         log_var = self.fc_var(result)
 
-        # return [mu, log_var]
         return EncoderReturn(mu=mu, log_var=log_var, pre_latents=result)
 
     def decode(self, z: torch.tensor) -> torch.tensor:
@@ -60,10 +52,6 @@ class VanillaVAE(nn.Module):
         :param z: (torch.tensor) [B x D]
         :return: (torch.tensor) [B x C x H x W]
         """
-        # result = self.decoder_input(z)
-        # result = self.reshape(result)
-        # result = self.decoder(result)
-        # result = self.final_layer(result)
         result = self.full_decoder(z)
         return result
 
@@ -79,14 +67,13 @@ class VanillaVAE(nn.Module):
         eps = torch.randn_like(std)
         return eps * std + mu
 
-    def forward(self, input: torch.tensor, **kwargs) -> list[torch.tensor]:
+    def forward(self, input: torch.tensor) -> ForwardReturn:
         latents = self.encode(input)
         mu, log_var, _ = latents.values()
         z = self.reparametrize(mu, log_var)
-        # return [self.decode(z), input, mu, log_var]
         return ForwardReturn(output=self.decode(z), input=input, latents=latents)
 
-    def loss(self, output_model: ForwardReturn, kld_weight, **kwargs) -> dict:
+    def loss(self, output_model: ForwardReturn, kld_weight: float) -> dict:
         """Computes the VAE loss function.
 
         KL(N(\mu, \sigma), N(0, 1)) = \log \frac{1}{\sigma} + \frac{\sigma^2 + \mu^2}{2} - \frac{1}{2}
@@ -97,7 +84,7 @@ class VanillaVAE(nn.Module):
 
         return loss_function(output_model, kld_weight)
 
-    def sample(self, num_samples: int, current_device: int, **kwargs) -> torch.tensor:
+    def sample(self, num_samples: int) -> torch.tensor:
         """
         Samples from the latent space and return the corresponding
         image space map.
@@ -109,7 +96,7 @@ class VanillaVAE(nn.Module):
         samples = self.decode(z)
         return samples
 
-    def generate(self, x: torch.tensor, **kwargs) -> torch.tensor:
+    def generate(self, x: torch.tensor) -> torch.tensor:
         """
         Given an input image x, returns the reconstructed image
         :param x: (torch.tensor) [B x C x H x W]
