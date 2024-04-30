@@ -4,7 +4,7 @@ import torch
 from rich import print as pprint
 from torchsummary import summary
 
-from encyclopedia_vae.models import VanillaVAE
+from encyclopedia_vae.models.vanilla_vae import VanillaVAE
 
 
 class TestVAE(unittest.TestCase):

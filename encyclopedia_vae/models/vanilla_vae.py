@@ -15,6 +15,7 @@ class VanillaVAE(nn.Module):
         self,
         in_channels: int,
         latent_dim: int,
+        latent_dim_dec: int = None,
         hidden_dims: list = [32, 64, 128, 256, 512],
         mid_inflate: int = 2,
         mid_dim: int = 512 * 4,
@@ -22,6 +23,8 @@ class VanillaVAE(nn.Module):
         super().__init__()
 
         self.latent_dim = latent_dim
+        if not latent_dim_dec:
+            latent_dim_dec = latent_dim
 
         self.encoder = build_encoder(in_channels=in_channels, hidden_dims=hidden_dims)
         self.flatten = Rearrange("B C H W -> B (C H W)")
@@ -29,7 +32,7 @@ class VanillaVAE(nn.Module):
         self.fc_var = nn.Linear(mid_dim, latent_dim)
 
         self.full_decoder = build_full_decoder(
-            latent_dim=latent_dim,
+            latent_dim=latent_dim_dec,
             hidden_dims=hidden_dims[::-1],
             mid_inflate=mid_inflate,
             mid_dim=mid_dim,
