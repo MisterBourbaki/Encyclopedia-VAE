@@ -1,10 +1,6 @@
 
-Data/
-logs/
-
-VanillaVAE/version_0/
-
 __pycache__/
-.ipynb_checkpoints/
-
-Run.ipynb
+encyclopedia_vae/models_leg/
+tests_leg/
+.idea
+configs_leg/

@@ -3,20 +3,19 @@ import unittest
 import torch
 from torchsummary import summary
 
-from encyclopedia_vae.models.betatc_vae import BetaTCVAE
+from encyclopedia_vae.models.beta_vae import BetaVAE
 
 
-class TestBetaTCVAE(unittest.TestCase):
+class TestVAE(unittest.TestCase):
     def setUp(self) -> None:
         # self.model2 = VAE(3, 10)
-        self.model = BetaTCVAE(3, 64, anneal_steps=100)
+        self.model = BetaVAE(3, 10, loss_type="H")
 
     def test_summary(self):
         print(summary(self.model, (3, 64, 64), device="cpu"))
         # print(summary(self.model2, (3, 64, 64), device='cpu'))
 
     def test_forward(self):
-        print(sum(p.numel() for p in self.model.parameters() if p.requires_grad))
         x = torch.randn(16, 3, 64, 64)
         y = self.model(x)
         print("Model Output size:", y["output"].size())
@@ -28,16 +27,6 @@ class TestBetaTCVAE(unittest.TestCase):
         result = self.model(x)
         loss = self.model.loss(result, kld_weight=0.005)
         print(loss)
-
-    def test_sample(self):
-        self.model
-        y = self.model.sample(8)
-        print(y.shape)
-
-    def test_generate(self):
-        x = torch.randn(16, 3, 64, 64)
-        y = self.model.generate(x)
-        print(y.shape)
 
 
 if __name__ == "__main__":
