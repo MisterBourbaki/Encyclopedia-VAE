@@ -1,29 +1,20 @@
 import os
-import math
-import torch
-from torch import optim
-from models import BaseVAE
-from models.types_ import *
-from utils import data_loader
+
 import pytorch_lightning as pl
-from torchvision import transforms
+import torch
 import torchvision.utils as vutils
-from torchvision.datasets import CelebA
-from torch.utils.data import DataLoader
+from models import BaseVAE
+from torch import optim
 
 
 class VAEXperiment(pl.LightningModule):
     def __init__(self, vae_model: BaseVAE, params: dict) -> None:
-        super(VAEXperiment, self).__init__()
+        super().__init__()
 
         self.model = vae_model
         self.params = params
         self.curr_device = None
         self.hold_graph = False
-        try:
-            self.hold_graph = self.params["retain_first_backpass"]
-        except:
-            pass
 
     def forward(self, input: torch.tensor, **kwargs) -> torch.tensor:
         return self.model(input, **kwargs)
@@ -84,20 +75,17 @@ class VAEXperiment(pl.LightningModule):
             nrow=12,
         )
 
-        try:
-            samples = self.model.sample(144, self.curr_device, labels=test_label)
-            vutils.save_image(
-                samples.cpu().data,
-                os.path.join(
-                    self.logger.log_dir,
-                    "Samples",
-                    f"{self.logger.name}_Epoch_{self.current_epoch}.png",
-                ),
-                normalize=True,
-                nrow=12,
-            )
-        except Warning:
-            pass
+        samples = self.model.sample(144, self.curr_device, labels=test_label)
+        vutils.save_image(
+            samples.cpu().data,
+            os.path.join(
+                self.logger.log_dir,
+                "Samples",
+                f"{self.logger.name}_Epoch_{self.current_epoch}.png",
+            ),
+            normalize=True,
+            nrow=12,
+        )
 
     def configure_optimizers(self):
         optims = []
@@ -110,32 +98,23 @@ class VAEXperiment(pl.LightningModule):
         )
         optims.append(optimizer)
         # Check if more than 1 optimizer is required (Used for adversarial training)
-        try:
-            if self.params["LR_2"] is not None:
-                optimizer2 = optim.Adam(
-                    getattr(self.model, self.params["submodel"]).parameters(),
-                    lr=self.params["LR_2"],
-                )
-                optims.append(optimizer2)
-        except:
-            pass
 
-        try:
-            if self.params["scheduler_gamma"] is not None:
-                scheduler = optim.lr_scheduler.ExponentialLR(
-                    optims[0], gamma=self.params["scheduler_gamma"]
-                )
-                scheds.append(scheduler)
+        if self.params["LR_2"] is not None:
+            optimizer2 = optim.Adam(
+                getattr(self.model, self.params["submodel"]).parameters(),
+                lr=self.params["LR_2"],
+            )
+            optims.append(optimizer2)
 
-                # Check if another scheduler is required for the second optimizer
-                try:
-                    if self.params["scheduler_gamma_2"] is not None:
-                        scheduler2 = optim.lr_scheduler.ExponentialLR(
-                            optims[1], gamma=self.params["scheduler_gamma_2"]
-                        )
-                        scheds.append(scheduler2)
-                except:
-                    pass
-                return optims, scheds
-        except:
-            return optims
+        if self.params["scheduler_gamma"] is not None:
+            scheduler = optim.lr_scheduler.ExponentialLR(
+                optims[0], gamma=self.params["scheduler_gamma"]
+            )
+            scheds.append(scheduler)
+        if self.params["scheduler_gamma_2"] is not None:
+            scheduler2 = optim.lr_scheduler.ExponentialLR(
+                optims[1], gamma=self.params["scheduler_gamma_2"]
+            )
+            scheds.append(scheduler2)
+
+        return optims, scheds

@@ -13,7 +13,7 @@ data_params:
   val_batch_size:  64
   patch_size: 64
   num_workers: 4
-  
+
 exp_params:
   LR: 0.005
   weight_decay: 0.0
