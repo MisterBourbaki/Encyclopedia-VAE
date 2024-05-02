@@ -16,7 +16,7 @@ repos:
     -   id: poetry-lock
         args: ["--no-update"]
     -   id: poetry-install
-        args: ["--sync", "--with", "dev,docs"]
+        args: ["--sync", "--with", "dev"]
 
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
