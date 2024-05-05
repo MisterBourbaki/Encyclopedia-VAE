@@ -16,3 +16,7 @@ ignore = ["PLR0913"]
 
 [lint.pydocstyle]
 convention = "numpy"
+
+[format]
+docstring-code-format = true
+docstring-code-line-length = 20
