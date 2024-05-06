@@ -18,6 +18,8 @@ jobs:
         uses: actions/setup-python@v4
       - uses: eifinger/setup-rye@v2
         id: setup-rye
+      - name: Use UV instead of pip
+        run: rye config --set-bool behavior.use-uv=true
       - name: Install dependencies
         run: |
           rye sync
