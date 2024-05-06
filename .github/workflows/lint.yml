@@ -7,27 +7,21 @@ on:
       - master
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    # strategy:
+    #   matrix:
+    #     python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: eifinger/setup-rye@v2
         id: setup-rye
         with:
           enable-cache: true
-          cache-prefix: ${{ matrix.python-version }}
-      - name: Pin python-version ${{ matrix.python-version }}
-        if: steps.setup-rye.outputs.cache-hit != 'true'
-        run: rye pin ${{ matrix.python-version }}
       - name: Install dependencies
-        if: steps.setup-rye.outputs.cache-hit != 'true'
         run: |
           rye sync
       - name: Lint and Format
-        if: steps.setup-rye.outputs.cache-hit != 'true'
         run: |
           rye fmt
           rye lint
