@@ -1,4 +1,4 @@
-name: Test
+name: Lint
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - master
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     # strategy:
     #   matrix:
@@ -23,6 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           rye sync
-      - name: Run pytest
+      - name: Lint and Format
         run: |
-          rye run pytest --cov=encyclopedia_vae tests -v
+          rye fmt
+          rye lint
