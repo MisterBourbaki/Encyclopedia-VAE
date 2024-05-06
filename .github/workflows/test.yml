@@ -14,6 +14,8 @@ jobs:
     #     python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v4
       - uses: eifinger/setup-rye@v2
         id: setup-rye
         with:
