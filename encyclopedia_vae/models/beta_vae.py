@@ -1,9 +1,26 @@
+"""Module for the BetaVAE implementation."""
+
 from encyclopedia_vae.losses import loss_function_beta
 from encyclopedia_vae.models.vanilla_vae import VanillaVAE
 from encyclopedia_vae.types_helpers import ForwardReturn, LossReturn
 
 
 class BetaVAE(VanillaVAE):
+    """Implementation of BetaVAE model.
+
+    Subclass the bare VAE model that is VanillaVAE.
+
+    Attributes
+    ----------
+    beta: int
+        beta arg, by default 4.
+
+    Methods
+    -------
+    loss(output_model, kld_weight)
+        the loss function for the BetaVAE model.
+    """
+
     def __init__(
         self,
         in_channels: int,
@@ -12,7 +29,7 @@ class BetaVAE(VanillaVAE):
         beta: int = 4,
         gamma: float = 1000.0,
         max_capacity: int = 25,
-        Capacity_max_iter: int = 1e5,
+        capacity_stop_iter: int = 1e5,
         loss_type: str = "B",
     ) -> None:
         super().__init__(
@@ -22,17 +39,31 @@ class BetaVAE(VanillaVAE):
         self.beta = beta
         self.gamma = gamma
         self.loss_type = loss_type
-        self.C_max = max_capacity
-        self.C_stop_iter = Capacity_max_iter
+        self.capa_max = max_capacity
+        self.capa_stop_iter = capacity_stop_iter
         self.num_iter = 0
 
     def loss(self, output_model: ForwardReturn, kld_weight: float) -> LossReturn:
+        """Loss function.
+
+        Parameters
+        ----------
+        output_model : ForwardReturn
+            _description_
+        kld_weight : float
+            _description_
+
+        Returns
+        -------
+        LossReturn
+            _description_
+        """
         loss = loss_function_beta(
             output_model=output_model,
             kld_weight=kld_weight,
             num_iter=self.num_iter,
-            C_max=self.C_max,
-            C_stop_iter=self.C_stop_iter,
+            capa_max=self.capa_max,
+            capa_stop_iter=self.capa_stop_iter,
             loss_type=self.loss_type,
             beta=self.beta,
             gamma=self.gamma,

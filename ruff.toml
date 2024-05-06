@@ -4,13 +4,16 @@ line-length = 88
 [lint]
 extend-select = [
   "UP",  # pyupgrade
-#   "D",   # pydocstyle
-  "E4",
-  "E7",
-  "E9",
+  "D",   # pydocstyle
+  # "E4",
+  # "E7",
+  # "E9",
+  "E",
   "F",
   "I",
   "PL",
+  "N",
+  "F",
 ]
 ignore = ["PLR0913"]
 
