@@ -1,4 +1,4 @@
-name: Test
+name: Lint
 
 on:
   push:
@@ -28,7 +28,8 @@ jobs:
         if: steps.setup-rye.outputs.cache-hit != 'true'
         run: |
           rye sync
-      - name: Run pytest
+      - name: Lint and Format
         if: steps.setup-rye.outputs.cache-hit != 'true'
         run: |
-          rye run pytest --cov=encyclopedia_vae tests -v
+          rye fmt
+          rye lint
