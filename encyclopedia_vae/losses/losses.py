@@ -20,22 +20,22 @@ import torch
 from einops import rearrange
 from torch.nn import functional as F  # noqa N812
 
-from encyclopedia_vae.types_helpers import ForwardReturn, LossBetaTCReturn, LossReturn
+from encyclopedia_vae.types_helpers import OutputLoss, OutputLossBetaTC, OutputModel
 
 
-def loss_function(output_model: ForwardReturn, kld_weight: float) -> LossReturn:
+def loss_function(output_model: OutputModel, kld_weight: float) -> OutputLoss:
     """Compute the classical VAE loss function.
 
     Parameters
     ----------
-    output_model : ForwardReturn
+    output_model : OutputModel
         the output of a VAE-based model.
     kld_weight : float
         weight of the KLD loss. The weight of the reconstruction loss is at 1.
 
     Returns
     -------
-    LossReturn
+    OutputLoss
     """
     recons_loss = F.mse_loss(output_model["output"], output_model["input"])
 
@@ -43,7 +43,7 @@ def loss_function(output_model: ForwardReturn, kld_weight: float) -> LossReturn:
         output_model["encoded"]["mu"], output_model["encoded"]["log_var"]
     )
     loss = recons_loss + kld_weight * kld_loss
-    return LossReturn(loss=loss, reconstruction_loss=recons_loss, kld_loss=-kld_loss)
+    return OutputLoss(loss=loss, reconstruction_loss=recons_loss, kld_loss=-kld_loss)
 
 
 def compute_kld_loss(mu: torch.tensor, log_var: torch.tensor) -> torch.tensor:
@@ -80,7 +80,7 @@ class LossType(str, Enum):
 
 
 def loss_function_beta(
-    output_model: ForwardReturn,
+    output_model: OutputModel,
     kld_weight: float,
     num_iter: int,
     capa_max: float,
@@ -88,12 +88,12 @@ def loss_function_beta(
     loss_type: LossType,
     beta: float,
     gamma: float,
-) -> LossReturn:
+) -> OutputLoss:
     """Compute the loss dedicated to the BetaVAE model.
 
     Parameters
     ----------
-    output_model : ForwardReturn
+    output_model : OutputModel
         the output of a VAE-based model.
     kld_weight : float
         weight of the KLD loss. The weight of the reconstruction loss is at 1.
@@ -112,7 +112,7 @@ def loss_function_beta(
 
     Returns
     -------
-    LossReturn
+    OutputLoss
         _description_
 
     Raises
@@ -134,7 +134,7 @@ def loss_function_beta(
     else:
         raise ValueError("Undefined loss type.")
 
-    return LossReturn(loss=loss, reconstruction_loss=recons_loss, kld_loss=-kld_loss)
+    return OutputLoss(loss=loss, reconstruction_loss=recons_loss, kld_loss=-kld_loss)
 
 
 def log_density_gaussian(
@@ -162,19 +162,19 @@ def log_density_gaussian(
 
 
 def loss_function_betatc(
-    output_model: ForwardReturn,
+    output_model: OutputModel,
     kld_weight: float,
     num_iter: int,
     anneal_steps: int,
     alpha: float,
     beta: float,
     gamma: float,
-) -> LossBetaTCReturn:
+) -> OutputLossBetaTC:
     """Compute the loss dedicated to the model BeatTCVAE.
 
     Parameters
     ----------
-    output_model : ForwardReturn
+    output_model : OutputModel
         the output of a VAE-based model.
     kld_weight : float
         weight of the KLD loss. The weight of the reconstruction loss is at 1.
@@ -191,7 +191,7 @@ def loss_function_betatc(
 
     Returns
     -------
-    LossBetaTCReturn
+    OutputLossBetaTC
         _description_
     """
     mu, log_var, _ = output_model["encoded"].values()
@@ -242,7 +242,7 @@ def loss_function_betatc(
         + weight * (beta * tc_loss + anneal_rate * gamma * kld_loss)
     )
 
-    return LossBetaTCReturn(
+    return OutputLossBetaTC(
         loss=loss,
         reconstruction_loss=recons_loss,
         kld_loss=-kld_loss,

@@ -1,3 +1,5 @@
+"""Module containing the function generating various Encoder."""
+
 from torch import nn
 
 
@@ -7,7 +9,7 @@ def build_encoder(
     kernel_size: int = 3,
     padding: int = 1,
     stride: int = 2,
-) -> nn.Module:
+) -> nn.Sequential:
     """Return a 2d-convolutional, sequential Encoder.
 
     Parameters
@@ -15,7 +17,8 @@ def build_encoder(
     in_channels : int
         number of channels in the input
     hidden_dims : list[int], optional
-        list of the number of channels of the intermediate, "hidden" convolution layers, by default [32, 64, 128, 256, 512]
+        list of the number of channels of the intermediate,
+        "hidden" convolution layers, by default [32, 64, 128, 256, 512]
     kernel_size : int, optional
         the kernel size of all convolutional layers, by default 3
     padding : int, optional
@@ -25,7 +28,7 @@ def build_encoder(
 
     Returns
     -------
-    nn.Module
+    nn.Sequential
         the sequence of convolutional layers
     """
     _layers = []

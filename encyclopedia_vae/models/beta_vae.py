@@ -2,7 +2,7 @@
 
 from encyclopedia_vae.losses import loss_function_beta
 from encyclopedia_vae.models.vanilla_vae import VanillaVAE
-from encyclopedia_vae.types_helpers import ForwardReturn, LossReturn
+from encyclopedia_vae.types_helpers import OutputLoss, OutputModel
 
 
 class BetaVAE(VanillaVAE):
@@ -43,19 +43,21 @@ class BetaVAE(VanillaVAE):
         self.capa_stop_iter = capacity_stop_iter
         self.num_iter = 0
 
-    def loss(self, output_model: ForwardReturn, kld_weight: float) -> LossReturn:
+    def loss(self, output_model: OutputModel, kld_weight: float) -> OutputLoss:
         """Loss function.
+
+        Wraps the encyclopedia_vae.losses.loss_function_beta.
 
         Parameters
         ----------
-        output_model : ForwardReturn
+        output_model : OutputModel
             _description_
         kld_weight : float
             _description_
 
         Returns
         -------
-        LossReturn
+        OutputLoss
             _description_
         """
         loss = loss_function_beta(

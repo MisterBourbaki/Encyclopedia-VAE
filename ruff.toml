@@ -4,7 +4,7 @@ line-length = 88
 [lint]
 extend-select = [
   "UP",  # pyupgrade
-  "D",   # pydocstyle
+  # "D",   # pydocstyle
   # "E4",
   # "E7",
   # "E9",
