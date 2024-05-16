@@ -12,6 +12,7 @@ trainer:
     - class_ath: lightning.pytorch.callbacks.RichProgressBar
     - class_path: lightning.pytorch.callbacks.EarlyStopping
       init_args:
+        monitor: val_loss
         patience: 5
   fast_dev_run: false
   max_epochs: 100
@@ -61,7 +62,7 @@ model:
   scheduler_gamma: 0.95
   kld_weight: 0.00025
 data:
-  data_dir: null
+  data_dir: data/
   batch_size: 8
   patch_size:
   - 256
