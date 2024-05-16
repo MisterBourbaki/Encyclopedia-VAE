@@ -69,20 +69,10 @@ class LitOxfordIIITPet(LightningDataModule):
                     split="trainval",
                     transform=self.list_transforms,
                 ),
-                [80, 20],
+                [0.8, 0.2],
                 generator=torch.Generator().manual_seed(42),
             )
-            self.train_dataset = OxfordIIITPet(
-                self.data_dir,
-                split="trainval",
-                transform=self.list_transforms,
-            )
 
-            self.val_dataset = OxfordIIITPet(
-                self.data_dir,
-                split="valid",
-                transform=self.list_transforms,
-            )
         if stage == "test":
             self.test_dataset = OxfordIIITPet(
                 self.data_dir,
