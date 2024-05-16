@@ -1,7 +1,9 @@
 from collections.abc import Sequence
 from typing import Optional, Union
 
+import torch
 from lightning.pytorch import LightningDataModule
+from torch.utils import data
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import OxfordIIITPet
@@ -50,12 +52,7 @@ class LitOxfordIIITPet(LightningDataModule):
     def prepare_data(self):
         OxfordIIITPet(
             self.data_dir,
-            split="train",
-            download=True,
-        )
-        OxfordIIITPet(
-            self.data_dir,
-            split="valid",
+            split="trainval",
             download=True,
         )
         OxfordIIITPet(
@@ -66,9 +63,18 @@ class LitOxfordIIITPet(LightningDataModule):
 
     def setup(self, stage: Optional[str] = None) -> None:
         if stage == "fit":
+            self.train_dataset, self.val_dataset = data.random_split(
+                OxfordIIITPet(
+                    self.data_dir,
+                    split="trainval",
+                    transform=self.list_transforms,
+                ),
+                [80, 20],
+                generator=torch.Generator().manual_seed(42),
+            )
             self.train_dataset = OxfordIIITPet(
                 self.data_dir,
-                split="train",
+                split="trainval",
                 transform=self.list_transforms,
             )
 
