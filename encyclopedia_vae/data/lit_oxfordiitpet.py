@@ -5,8 +5,8 @@ import torch
 from lightning.pytorch import LightningDataModule
 from torch.utils import data
 from torch.utils.data import DataLoader
-from torchvision import transforms
 from torchvision.datasets import OxfordIIITPet
+from torchvision.transforms import v2
 
 
 class LitOxfordIIITPet(LightningDataModule):
@@ -39,13 +39,13 @@ class LitOxfordIIITPet(LightningDataModule):
         self.patch_size = patch_size
         self.num_workers = num_workers
         self.pin_memory = pin_memory
-        self.list_transforms = transforms.Compose(
+        self.list_transforms = v2.Compose(
             [
-                transforms.RandomHorizontalFlip(),
-                transforms.CenterCrop(self.patch_size),
-                transforms.Resize(self.patch_size),
-                transforms.ToTensor(),
-                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+                v2.RandomHorizontalFlip(),
+                v2.CenterCrop(self.patch_size),
+                v2.Resize(self.patch_size),
+                v2.ToTensor(),
+                v2.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
             ]
         )
 
