@@ -1,3 +1,3 @@
-from .types_helpers import LossReturn
+from .types_helpers import OutputLoss
 
-__all__ = ["LossReturn"]
+__all__ = ["OutputLoss"]

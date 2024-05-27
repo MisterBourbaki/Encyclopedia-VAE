@@ -2,7 +2,7 @@ import torch
 from torch import nn
 
 from encyclopedia_vae.models.vanilla_vae import VanillaVAE
-from encyclopedia_vae.types_helpers import ForwardReturn
+from encyclopedia_vae.types_helpers import OutputModel
 
 
 class ConditionalVAE(VanillaVAE):
@@ -26,7 +26,7 @@ class ConditionalVAE(VanillaVAE):
         self.embed_class = nn.Linear(num_classes, img_size * img_size)
         self.embed_data = nn.Conv2d(in_channels, in_channels, kernel_size=1)
 
-    def forward(self, input: torch.tensor, labels: torch.tensor) -> ForwardReturn:
+    def forward(self, input: torch.tensor, labels: torch.tensor) -> OutputModel:
         y = labels.float()
         embedded_class = self.embed_class(y)
         embedded_class = embedded_class.view(
@@ -40,7 +40,7 @@ class ConditionalVAE(VanillaVAE):
         z = self.reparametrize(mu, log_var)
 
         z = torch.cat([z, y], dim=1)
-        return ForwardReturn(
+        return OutputModel(
             output=self.decode(z), input=input, encoded=latents, latents=z
         )
 
@@ -65,5 +65,4 @@ class ConditionalVAE(VanillaVAE):
         :param x: (torch.tensor) [B x C x H x W]
         :return: (torch.tensor) [B x C x H x W]
         """
-
         return self.forward(x, labels)["output"]

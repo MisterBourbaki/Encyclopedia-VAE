@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from torch.nn import functional as F
+from torch.nn import functional
 
 
 class VectorQuantizer(nn.Module):
@@ -47,8 +47,8 @@ class VectorQuantizer(nn.Module):
         quantized_latents = quantized_latents.view(latents_shape)  # [B x H x W x D]
 
         # Compute the VQ Losses
-        commitment_loss = F.mse_loss(quantized_latents.detach(), latents)
-        embedding_loss = F.mse_loss(quantized_latents, latents.detach())
+        commitment_loss = functional.mse_loss(quantized_latents.detach(), latents)
+        embedding_loss = functional.mse_loss(quantized_latents, latents.detach())
 
         vq_loss = commitment_loss * self.beta + embedding_loss
 

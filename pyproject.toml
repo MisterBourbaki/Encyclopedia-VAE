@@ -1,6 +1,6 @@
 [project]
 name = "encyclopedia-vae"
-version = "0.1.2"
+version = "0.2.0"
 description = "Add your description here"
 authors = [
     { name = "BaptisteMorisse", email = "bmorisse.pro@proton.me" }
@@ -10,9 +10,16 @@ dependencies = [
     "lightning[pytorch-extra]>=2.2.4",
     "einops>=0.8.0",
     "torchsummary>=1.5.1",
+    "jsonargparse[signatures]>=4.28.0",
+    # "torchvision>=0.18.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
+
+[project.optional-dependencies]
+examples = [
+    "torchvision>=0.18.0",
+]
 
 [build-system]
 requires = ["hatchling"]
