@@ -11,7 +11,8 @@ dependencies = [
     "einops>=0.8.0",
     "torchsummary>=1.5.1",
     "jsonargparse[signatures]>=4.28.0",
-    # "torchvision>=0.18.0",
+    "pykeops>=2.2.3",
+    "rich>=13.7.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
@@ -33,6 +34,7 @@ dev-dependencies = [
     "pytest-examples>=0.0.10",
     "ruff>=0.4.3",
     "pre-commit>=3.7.0",
+    "ipython>=8.18.1",
 ]
 
 [tool.hatch.metadata]
